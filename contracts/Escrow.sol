@@ -10,5 +10,24 @@ interface IERC721 {
 }
 
 contract Escrow {
+// giveng all party it's variable's..
+
+    address public lender;
+    address public nftAddress;
+    address payable public seller;
+    address public inspector;
+
+// storing info while contract uplod only 1 time
+    constructor(
+        address _nftAddress,
+        address  payable _seller,
+        address _lender, 
+        address _inspector
+    ) {
+        nftAddress = _nftAddress;
+        seller = _seller;
+        lender = _lender;
+        inspector = _inspector;
+    }
 
 }

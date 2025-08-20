@@ -22,10 +22,22 @@ contract Escrow {
         _;
     }
 
+    modifier onlyBuyer(uint256 _nftID) {
+        require(msg.sender  == buyer[_nftID]  , "Only Buyer can access this function");
+        _;
+    }
+
+    modifier onlyInspector() {
+        require(msg.sender == inspector, "Only Inspector can access this function");
+        _;
+    }
+
     mapping(uint256 => bool) public isListed;
     mapping(uint256 => uint256) public purchasePrice;
     mapping(uint256 => uint256) public escroAmount;
     mapping(uint256 => address) public buyer;
+    mapping(uint256 => bool) public inspectonPassed;
+    mapping(uint256 => mapping(address => bool)) public approval;
 
 // storing info while contract uplod only 1 time
     constructor(
@@ -47,12 +59,70 @@ contract Escrow {
         uint256 _purchasePrice,
         uint256 _escroAmount
     ) public payable onlySeller{
-        IERC721(nftAddress).transferFrom(msg.sender, address(this), _nftID);       
+        IERC721(nftAddress).transferFrom(msg.sender, address(this), _nftID);
         isListed[_nftID] = true;
 
         purchasePrice[_nftID] = _purchasePrice;
         buyer[_nftID] = _buyer;
         escroAmount[_nftID] = _escroAmount;
+    }
+    
+    // Put Under Contract 
+    function depositeEarnest(
+        uint256 _nftID
+    ) public payable onlyBuyer(_nftID) {
+        require(msg.value >= escroAmount[_nftID] , "Insufficient amount to deposite");
+    }
+
+    // Update The Inspection Status of NFTs
+    function updateInspectionStatus(
+        uint256 _nftID,
+        bool _passed
+    ) public onlyInspector{
+        inspectonPassed[_nftID] = _passed;
+    }
+
+    // this check approvalof nftID is approved by buyer or not
+    function approveSale(
+        uint256 _nftID
+    ) public  {
+        approval[_nftID][msg.sender] = true;
+    }
+
+    function finalizeSale(
+        uint256 _nftID        
+    ) public {        
+        require(inspectonPassed[_nftID]);
+        require( approval[_nftID][buyer[_nftID]] );
+        require( approval[_nftID][seller] );
+        require( approval[_nftID][lender] );
+        require(address(this).balance >= purchasePrice[_nftID] , "Insufficient balance in contract to finalize sale");
+        
+        isListed[_nftID] = false;
+        
+        (bool sucess,) = payable(seller).call{value: address(this).balance}("");
+        require(sucess);
+
+        IERC721(nftAddress).transferFrom(address(this), buyer[_nftID], _nftID);       
+    }
+
+    function cancleTransaction(
+        uint256 _nftID
+    ) public {
+        if(inspectonPassed[_nftID]== false){
+            payable(buyer[_nftID]).transfer(escroAmount[_nftID]);
+        }else{
+            payable(seller).transfer(address(this).balance);
+        }
+    }
+
+    receive() external payable {
+        // This function allows the contract to receive Ether
+    }
+
+    function getBalance(
+    ) public view returns (uint256) {
+        return address(this).balance;
     }
 
 }

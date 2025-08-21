@@ -11,9 +11,9 @@ describe('Escrow', () => {
     let realEstate, escrow;
 
     beforeEach( async() => {
-    [buyer, seller, lender, inspector] = await ethers.getSigners();    
+    [buyer, seller, lender, inspector] = await ethers.getSigners();
     
-    // Deploy The RealEstate Contract in HardHat
+    // geting The RealEstate Contract in HardHat
     const RealEstate = await ethers.getContractFactory('RealEstate');
     realEstate = await RealEstate.deploy();
     

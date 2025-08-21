@@ -3,6 +3,7 @@ import { useEffect, useState } from "react";
 
 // Components
 import Navigation from "./components/Navigation";
+import Search from "./components/Search";
 // ABIs
 // Config
 
@@ -13,6 +14,7 @@ function App() {
   const loadBlockChainData = async () => {  
     const provider = new ethers.providers.Web3Provider(window.ethereum);    
     
+    // update if account is been changed
     window.ethereum.on('accountsChanged', async() => {
       const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
       const account = ethers.utils.getAddress(accounts[0]);
@@ -27,6 +29,8 @@ function App() {
   return (
     <div>
       <Navigation accounts ={account} setAccount={setAccount} > </Navigation>
+
+      <Search />
       <div className='cards__section'>
 
         <h3>Welcome to Millow!</h3>

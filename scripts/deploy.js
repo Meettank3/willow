@@ -34,8 +34,8 @@ async function main() {
     lender.address,
     inspector.address
   )
-
   await escrow.deployed();
+  
   console.log(`Escrow deployed at: ${escrow.address}`);
 
   for (let i = 0; i < 3; i++) {

@@ -5,14 +5,30 @@ import { useEffect, useState } from "react";
 import Navigation from "./components/Navigation";
 import Search from "./components/Search";
 // ABIs
+import RealEstate from "./abis/RealEstate.json";
 // Config
+import config from "./config.json";
+
 
 function App() {
+  
+  const [provider,setProvider] = useState(null);
   const [account,setAccount] = useState(null);
-  //1.39.31
-
+  
   const loadBlockChainData = async () => {  
-    const provider = new ethers.providers.Web3Provider(window.ethereum);    
+    const provider = new ethers.providers.Web3Provider(window.ethereum);   
+    setProvider(provider); // Update the provider state 
+    
+    // connect to network
+    const network = await provider.getNetwork();
+    console.log("Chain ID:", network.chainId);
+
+    const realEstate = new ethers.Contract(config[network.chainId].realEstate.address, RealEstate, provider)
+    const totalSupply = await realEstate.totalSupply()
+
+    console.log("Total Supply: ", totalSupply.toString() );
+
+
     
     // update if account is been changed
     window.ethereum.on('accountsChanged', async() => {

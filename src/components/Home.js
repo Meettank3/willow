@@ -1,7 +1,9 @@
 import close from '../assets/close.svg';
 
-const Home = ({ home, provider, escrow, togglePop }) => {
 
+const Home = ({ home, provider, escrow, togglePop }) => {
+    if (!home) return null;
+    console.log("Home metadata:", home);
     return (
         <div className="home">
             <div className='home__details'>
@@ -18,7 +20,12 @@ const Home = ({ home, provider, escrow, togglePop }) => {
                     </p>
                     <p> {home.address} </p>
                     <h2> {home.attributes[0].value} ETH </h2>
-                </div>
+                    <div>
+                        <button className='home__buy' >
+                            Buy
+                        </button>
+                    </div>
+                </div> 
 
                 <button onClick={ togglePop } className='home__close' >
                     <img src={close} alt="close" />

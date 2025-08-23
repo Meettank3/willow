@@ -1,7 +1,6 @@
 import { ethers } from "ethers"; // ✅ Works in browser
 import { useEffect, useState } from "react";
 
-
 // Components
 import Home from "./components/Home";
 import Navigation from "./components/Navigation";
@@ -19,7 +18,7 @@ function App() {
   const [account, setAccount] = useState(null);
   const [homes, setHomes] = useState([]);
   // for toggleProp
-  const [home, setHome] = useState([]);
+  const [home, setHome] = useState(null);
   const [toggle, setToggle] = useState([false]);
   
   const loadBlockChainData = async () => {  

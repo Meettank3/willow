@@ -1,7 +1,64 @@
+import React, { useEffect, useState } from "react";
 import close from '../assets/close.svg';
 
 
-const Home = ({ home, provider, escrow, togglePop }) => {
+const Home = ({ home, provider,account , escrow, togglePop }) => {
+
+    const [hasBrought, setHasBrought] = useState(false);
+    const [hasLended, setHasLended] = useState(false);
+    const [hasInspected, setHasInspected] = useState(false);
+    const [hasSold, setHasSold] = useState(false);
+
+    const [buyer, setBuyer] = useState(null);
+    const [lender, setlender] = useState(null);
+    const [inspector, setInspector] = useState(null);
+    const [seller, setSeller] = useState(null);
+    const [owner, setOwner] = useState(null);
+
+
+    const fetchDetails = async () => {
+        // For Buyer
+        const buyer = await escrow.buyer(home.id);
+        setBuyer(buyer);
+
+        const hasBrought = await escrow.approveSale(home.id, buyer);
+        setHasBrought(hasBrought);
+
+        // for Seller
+        const seller = await escrow.seller();
+        setSeller(seller);
+
+        const hasSold = await escrow.approveSale(home.id, seller);
+        setHasSold(hasSold);
+
+        // for lender
+        const lender = await escrow.lender();
+        setlender(lender);
+
+        const hasLended = await escrow.approveSale(home.id, lender);
+        setHasLended(hasLended);
+
+        //for inspector
+        inspector = await escrow.inspector();
+        setInspector(inspector);
+
+        const hasInspected = await escrow.inspectonPassed(home.id);
+        setHasInspected(hasInspected);
+    }
+
+    const fetchOwner = async () => {
+
+        if(await escrow.isListed(home.id)) return;
+
+        const owner = await escrow.buyer(home.id);
+        setOwner(owner);
+    }
+
+    useEffect( () =>{
+        fetchDetails();
+        fetchOwner();
+    }, [hasSold]);
+    
     if (!home) return null;
     console.log("Home metadata:", home);
     return (
@@ -20,10 +77,55 @@ const Home = ({ home, provider, escrow, togglePop }) => {
                     </p>
                     <p> {home.address} </p>
                     <h2> {home.attributes[0].value} ETH </h2>
-                    <div>
-                        <button className='home__buy' >
-                            Buy
+
+                    { owner ? (
+                        <div className="home__owned">
+                            Owned by {owner.slice(0, 6)}...{owner.slice(38, 42)}
+                        </div>
+                    ) : (
+                        <div> 
+                            {(account === inspector) ? (
+                            <button className='home__buy' >
+                                Approve Inspection
+                            </button>
+                            ) : (account === lender) ? (
+                            <button className='home__buy' >
+                                Approve & Lender
+                            </button>
+                            ) : (account === seller) ? (
+                            <button className='home__buy' >
+                                Approve Inspection
+                            </button>
+                            ) : (
+                                <button className='home__buy' >
+                                Buy
+                            </button>
+                            )}
+                        <button className='home__contact' >
+                            Contact Agent
                         </button>
+                        </div>
+                    )}
+
+                    <div>
+
+                    </div>
+                    <div>
+
+
+                        <hr/>
+                        <h2>Overview</h2>
+                        <p>
+                            {home.description}
+                        </p>
+
+                        <hr/>
+                        <h2>Facts and Features</h2>
+                        <ul>
+                            {home.attributes.map((attribute, index) => (
+                                <li key={index}><strong>{attribute.trait_type}</strong>: {attribute.value} </li>
+                            ))}
+                        </ul>
                     </div>
                 </div> 
 

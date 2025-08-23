@@ -14,7 +14,12 @@ import config from "./config.json";
 function App() {
   
   const [provider,setProvider] = useState(null);
+
+  const [escrow,setEscrow] = useState(null);
+
   const [account,setAccount] = useState(null);
+
+  const [homes,setHomes] = useState([]);
   
   const loadBlockChainData = async () => {  
     const provider = new ethers.providers.Web3Provider(window.ethereum);   
@@ -24,14 +29,24 @@ function App() {
     const network = await provider.getNetwork();
     console.log("Chain ID:", network.chainId);
 
+    // Connecting RealEstate Contract
     const realEstate = new ethers.Contract(config[network.chainId].realEstate.address, RealEstate, provider)
     const totalSupply = await realEstate.totalSupply()
 
-    console.log("Total Supply: ", totalSupply.toString());
+    // Adding Homes from ipfs
+    const homes = [];
 
+    for (let i = 1; i <= totalSupply; i++) {
+      const uri = await realEstate.tokenURI(i);
+      const response = await fetch(uri);
+      const metadata = await response.json();
+      homes.push(metadata);
+    }
+    setHomes(homes); // Update the homes state
+
+    // Connecting Escrow Contract
     const escrow = new ethers.Contract(config[network.chainId].escrow.address, Escrow, provider);
-    console.log("Escrow Contract:", escrow.address);
-    
+    setEscrow(escrow); // Update the escrow state
 
 
     

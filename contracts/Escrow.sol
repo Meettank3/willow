@@ -34,7 +34,7 @@ contract Escrow {
 
     mapping(uint256 => bool) public isListed;
     mapping(uint256 => uint256) public purchasePrice;
-    mapping(uint256 => uint256) public escroAmount;
+    mapping(uint256 => uint256) public escrowAmount;
     mapping(uint256 => address) public buyer;
     mapping(uint256 => bool) public inspectonPassed;
     mapping(uint256 => mapping(address => bool)) public approval;
@@ -64,14 +64,14 @@ contract Escrow {
 
         purchasePrice[_nftID] = _purchasePrice;
         buyer[_nftID] = _buyer;
-        escroAmount[_nftID] = _escroAmount;
+        escrowAmount[_nftID] = _escroAmount;
     }
     
     // Put Under Contract 
-    function depositeEarnest(
+    function depositEarnest(
         uint256 _nftID
     ) public payable onlyBuyer(_nftID) {
-        require(msg.value >= escroAmount[_nftID] , "Insufficient amount to deposite");
+        require(msg.value >= escrowAmount[_nftID] , "Insufficient amount to deposite");
     }
 
     // Update The Inspection Status of NFTs
@@ -110,7 +110,7 @@ contract Escrow {
         uint256 _nftID
     ) public {
         if(inspectonPassed[_nftID]== false){
-            payable(buyer[_nftID]).transfer(escroAmount[_nftID]);
+            payable(buyer[_nftID]).transfer(escrowAmount[_nftID]);
         }else{
             payable(seller).transfer(address(this).balance);
         }

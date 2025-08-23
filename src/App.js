@@ -43,6 +43,7 @@ function App() {
       homes.push(metadata);
     }
     setHomes(homes); // Update the homes state
+    console.log(homes);
 
     // Connecting Escrow Contract
     const escrow = new ethers.Contract(config[network.chainId].escrow.address, Escrow, provider);
@@ -74,7 +75,9 @@ function App() {
         <hr/>
 
         <div className="cards">
-          <div className="card" >
+          {homes.map((home, index) => (
+
+            <div className="card" key={index} >
             <div className="card__image">
               <img src="" alt="Home" />
             </div>
@@ -87,7 +90,10 @@ function App() {
               </p>
               <p>1234 elms street</p>
             </div>
-          </div>
+            </div>
+
+          ))}
+
         </div>
 
       </div>

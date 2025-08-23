@@ -5,6 +5,7 @@ import { useEffect, useState } from "react";
 import Navigation from "./components/Navigation";
 import Search from "./components/Search";
 // ABIs
+import Escrow from "./abis/Escrow.json";
 import RealEstate from "./abis/RealEstate.json";
 // Config
 import config from "./config.json";
@@ -27,6 +28,10 @@ function App() {
     const totalSupply = await realEstate.totalSupply()
 
     console.log("Total Supply: ", totalSupply.toString());
+
+    const escrow = new ethers.Contract(config[network.chainId].escrow.address, Escrow, provider);
+    console.log("Escrow Contract:", escrow.address);
+    
 
 
     

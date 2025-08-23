@@ -17,47 +17,49 @@ const Home = ({ home, provider,account , escrow, togglePop }) => {
 
 
     const fetchDetails = async () => {
-        // For Buyer
-        const buyer = await escrow.buyer(home.id);
-        setBuyer(buyer);
+        if (!escrow || !home?.id) return;  // safeguard
+      
+        try {
+          const buyerAddress = await escrow.buyer(home.id);
+          setBuyer(buyerAddress);
+      
+          const sellerAddress = await escrow.seller();
+          setSeller(sellerAddress);
+      
+          const lenderAddress = await escrow.lender();
+          setlender(lenderAddress);
+      
+          const inspectorAddress = await escrow.inspector();
+          setInspector(inspectorAddress);
+      
+          // optional: approvals/inspection if your contract supports them
+        } catch (err) {
+          console.error("Error fetching details:", err);
+        }
+      };
+      
+      const fetchOwner = async () => {
+        if (!escrow || !home?.id) return;  // safeguard
+      
+        try {
+          const listed = await escrow.isListed(home.id);
+          if (!listed) {
+            const ownerAddress = await escrow.buyer(home.id);
+            setOwner(ownerAddress);
+          }
+        } catch (err) {
+          console.error("Error fetching owner:", err);
+        }
+      };
+      
 
-        const hasBrought = await escrow.approveSale(home.id, buyer);
-        setHasBrought(hasBrought);
+    useEffect(() => {
+        if (escrow && home?.id) {
+            fetchDetails();
+            fetchOwner();
+        }
+    }, [escrow, home]);
 
-        // for Seller
-        const seller = await escrow.seller();
-        setSeller(seller);
-
-        const hasSold = await escrow.approveSale(home.id, seller);
-        setHasSold(hasSold);
-
-        // for lender
-        const lender = await escrow.lender();
-        setlender(lender);
-
-        const hasLended = await escrow.approveSale(home.id, lender);
-        setHasLended(hasLended);
-
-        //for inspector
-        inspector = await escrow.inspector();
-        setInspector(inspector);
-
-        const hasInspected = await escrow.inspectonPassed(home.id);
-        setHasInspected(hasInspected);
-    }
-
-    const fetchOwner = async () => {
-
-        if(await escrow.isListed(home.id)) return;
-
-        const owner = await escrow.buyer(home.id);
-        setOwner(owner);
-    }
-
-    useEffect( () =>{
-        fetchDetails();
-        fetchOwner();
-    }, [hasSold]);
     
     if (!home) return null;
     console.log("Home metadata:", home);

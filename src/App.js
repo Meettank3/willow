@@ -1,7 +1,9 @@
 import { ethers } from "ethers"; // ✅ Works in browser
 import { useEffect, useState } from "react";
 
+
 // Components
+import Home from "./components/Home";
 import Navigation from "./components/Navigation";
 import Search from "./components/Search";
 // ABIs
@@ -10,16 +12,15 @@ import RealEstate from "./abis/RealEstate.json";
 // Config
 import config from "./config.json";
 
-
 function App() {
   
-  const [provider,setProvider] = useState(null);
-
-  const [escrow,setEscrow] = useState(null);
-
-  const [account,setAccount] = useState(null);
-
-  const [homes,setHomes] = useState([]);
+  const [provider, setProvider] = useState(null);
+  const [escrow, setEscrow] = useState(null);
+  const [account, setAccount] = useState(null);
+  const [homes, setHomes] = useState([]);
+  // for toggleProp
+  const [home, setHome] = useState([]);
+  const [toggle, setToggle] = useState([false]);
   
   const loadBlockChainData = async () => {  
     const provider = new ethers.providers.Web3Provider(window.ethereum);   
@@ -63,6 +64,11 @@ function App() {
     loadBlockChainData()
   },[] )
 
+  const togglePop = (home) => {
+    setHome(home); // Update the home state for selected property
+    toggle ? setToggle(false) : setToggle(true); // Toggle the state
+  }
+
   return (
     <div>
       <Navigation accounts ={account} setAccount={setAccount} > </Navigation>
@@ -70,25 +76,25 @@ function App() {
       <Search />
       <div className='cards__section'>
 
-        <h3>Homes for you</h3>
+        <h3>Homes For You</h3>
 
         <hr/>
 
         <div className="cards">
           {homes.map((home, index) => (
 
-            <div className="card" key={index} >
+            <div className="card" key={index} onClick = { () => togglePop(home) } >
             <div className="card__image">
-              <img src="" alt="Home" />
+              <img src={home.image} alt="Home" />
             </div>
-            <div className="card__info">
-              <h4>1 ETH</h4>
+            <div  className="card__info">
+              <h4> {home.attributes[0].value} ETH</h4>
               <p>
-                <strong>1</strong> bds |
-                <strong>2</strong> ba |
-                <strong>3</strong> sqft
+                <strong> {home.attributes[2].value} </strong> Bed Rooms |
+                <strong> {home.attributes[3].value} </strong> Bathrooms |
+                <strong> {home.attributes[4].value} </strong> sqft
               </p>
-              <p>1234 elms street</p>
+              <p> {home.address} </p>
             </div>
             </div>
 
@@ -97,6 +103,10 @@ function App() {
         </div>
 
       </div>
+
+      {toggle && (
+        <Home home={home} provider={provider} account={account} escrow={escrow} togglePop={togglePop} />
+      )}
 
     </div>
   );

@@ -26,7 +26,7 @@ function App() {
     const realEstate = new ethers.Contract(config[network.chainId].realEstate.address, RealEstate, provider)
     const totalSupply = await realEstate.totalSupply()
 
-    console.log("Total Supply: ", totalSupply.toString() );
+    console.log("Total Supply: ", totalSupply.toString());
 
 
     

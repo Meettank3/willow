@@ -87,7 +87,7 @@ describe('Escrow', () => {
         });
 
         it("Returns Escrow Amount", async () => {
-            const result = await escrow.escroAmount(1);
+            const result = await escrow.escrowAmount(1);
             expect(result).to.be.equal(tokens(5));
         });
     
@@ -96,7 +96,7 @@ describe('Escrow', () => {
     describe('Deposits', () => {
         // this check if bool in mapping is marked as true instade of false in Escrow.sol file 
         it("Update contract balance",async () => {
-            const transaction = await escrow.connect(buyer).depositeEarnest(1, { value: tokens(5) });
+            const transaction = await escrow.connect(buyer).depositEarnest(1, { value: tokens(5) });
             await transaction.wait();
             const result = await escrow.getBalance();
             expect(result).to.be.equal(tokens(5));
@@ -132,7 +132,7 @@ describe('Escrow', () => {
 
     describe("Sale", async() => {
         beforeEach( async() => {
-            let transaction = await escrow.connect(buyer).depositeEarnest(1, { value: tokens(5) });
+            let transaction = await escrow.connect(buyer).depositEarnest(1, { value: tokens(5) });
             await transaction.wait();
 
             transaction = await escrow.connect(inspector).updateInspectionStatus(1, true);
